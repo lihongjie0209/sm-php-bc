@@ -53,6 +53,9 @@ jobs:
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit --testdox
       
+      - name: Run complete demo
+        run: php examples/complete_demo.php
+      
       - name: Run code coverage
         if: matrix.php-version == '8.3'
         run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.xml
