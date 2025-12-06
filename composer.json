@@ -1,6 +1,5 @@
 {
     "name": "lihongjie0209/sm-php-bc",
-    "version": "0.1.0",
     "description": "SM2/SM3/SM4 中国商用密码算法 PHP 实现 - 基于 Bouncy Castle 架构",
     "type": "library",
     "license": "MIT",
