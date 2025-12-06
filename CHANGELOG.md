@@ -5,6 +5,23 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.1.1] - 2025-12-06
+
+### 新增
+- 🔄 添加与 sm-js-bc 的跨语言互操作性测试
+- 🧪 新增 Node.js 脚本自动化测试 PHP 与 JavaScript 实现的兼容性
+- 🚀 完善 CI/CD 流水线，自动运行跨语言测试
+- ✅ 测试覆盖 SM2、SM3、SM4 各种模式
+
+### 改进
+- 📋 优化测试结构，确保与 JS 版本测试用例一致
+- 📝 改进文档，添加跨语言互操作性说明
+- 🔧 增强 GitHub Actions 工作流
+
+### 修复
+- 🐛 修复 composer.json 中不应包含 version 字段的警告
+- 🎨 优化代码结构和命名空间
+
 ## [0.1.0] - 2025-12-06
 
 ### 新增
@@ -42,4 +59,5 @@
 - 📦 支持 Composer 安装
 - 🌐 与 JS 版本互操作兼容
 
+[0.1.1]: https://github.com/lihongjie0209/sm-php-bc/releases/tag/v0.1.1
 [0.1.0]: https://github.com/lihongjie0209/sm-php-bc/releases/tag/v0.1.0

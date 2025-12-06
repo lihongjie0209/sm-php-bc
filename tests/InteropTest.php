@@ -11,17 +11,46 @@ use SmBc\Crypto\Digests\SM3Digest;
 use SmBc\Crypto\Engines\SM2Engine;
 
 /**
- * 跨语言互操作性测试
+ * 跨语言互操作性测试 - PHP 与 JavaScript (sm-js-bc NPM包) 互操作
  * 
- * 使用来自JS版本的已知测试向量验证PHP实现
+ * 测试 PHP 实现与 NPM 包 sm-js-bc 的兼容性
+ * 确保不同语言实现之间可以正确加密/解密、签名/验证
  */
 class InteropTest extends TestCase
 {
     /**
-     * SM4 ECB 模式互操作测试
+     * 执行 Node.js 脚本并返回结果
+     */
+    private function executeNode(string $script): string
+    {
+        // 在项目根目录创建临时文件，这样 Node.js 可以找到 node_modules
+        $projectRoot = dirname(__DIR__);
+        $tempFile = $projectRoot . DIRECTORY_SEPARATOR . 'temp_node_' . uniqid() . '.js';
+        file_put_contents($tempFile, $script);
+
+        try {
+            // 执行 Node.js
+            $command = "node " . escapeshellarg($tempFile) . " 2>&1";
+            $output = shell_exec($command);
+            
+            if ($output === null) {
+                throw new \RuntimeException("Failed to execute Node.js script");
+            }
+            
+            return trim($output);
+        } finally {
+            // 删除临时文件
+            if (file_exists($tempFile)) {
+                unlink($tempFile);
+            }
+        }
+    }
+
+    /**
+     * SM4 ECB 模式互操作测试 - 使用国密标准测试向量
      * 测试向量来自 GB/T 32907-2016
      */
-    public function testSM4_ECB_Interop(): void
+    public function testSM4_ECB_StandardVector(): void
     {
         // 已知测试向量（来自国密标准）
         $key = hex2bin('0123456789ABCDEFFEDCBA9876543210');
@@ -41,11 +70,13 @@ class InteropTest extends TestCase
     }
     
     /**
-     * SM3 摘要互操作测试
-     * 测试向量来自 GM/T 0004-2012
+     * SM3 摘要互操作测试 - PHP 与 JS 互操作
      */
-    public function testSM3_Interop(): void
+    public function testSM3_HashInterop(): void
     {
+        $message = 'abc';
+
+        // PHP 计算哈希
         $digest = new SM3Digest();
         
         // 测试向量1: "abc"
@@ -190,5 +221,204 @@ class InteropTest extends TestCase
         }
         
         $this->assertTrue(true);
+    }
+
+    /**
+     * 测试 SM4-ECB 互操作 - PHP 加密，JS 解密
+     */
+    public function testSM4EcbPhpEncryptJsDecrypt(): void
+    {
+        $key = '0123456789abcdeffedcba9876543210';
+        $plaintext = 'Hello SM4!';
+
+        // PHP 加密
+        $keyBin = hex2bin($key);
+        $ciphertext = SM4::encrypt($plaintext, $keyBin);
+        $ciphertextHex = bin2hex($ciphertext);
+
+        // JS 解密
+        $nodeScript = <<<JS
+const { SM4 } = require('sm-js-bc');
+const key = Buffer.from('$key', 'hex');
+const ciphertext = Buffer.from('$ciphertextHex', 'hex');
+const plaintext = SM4.decrypt(ciphertext, key);
+console.log(plaintext.toString('utf8'));
+JS;
+
+        $result = $this->executeNode($nodeScript);
+        $this->assertEquals($plaintext, $result);
+    }
+
+    /**
+     * 测试 SM4-ECB 互操作 - JS 加密，PHP 解密
+     */
+    public function testSM4EcbJsEncryptPhpDecrypt(): void
+    {
+        $key = '0123456789abcdeffedcba9876543210';
+        $plaintext = 'Hello from JS!';
+
+        // JS 加密
+        $nodeScript = <<<JS
+const { SM4 } = require('sm-js-bc');
+const key = Buffer.from('$key', 'hex');
+const plaintext = '$plaintext';
+const ciphertext = SM4.encrypt(Buffer.from(plaintext, 'utf8'), key);
+console.log(ciphertext.toString('hex'));
+JS;
+
+        $ciphertextHex = $this->executeNode($nodeScript);
+
+        // PHP 解密
+        $keyBin = hex2bin($key);
+        $ciphertext = hex2bin($ciphertextHex);
+        $decrypted = SM4::decrypt($ciphertext, $keyBin);
+
+        $this->assertEquals($plaintext, $decrypted);
+    }
+
+    /**
+     * 测试 SM3 哈希互操作 - PHP 与 JS 对比
+     */
+    public function testSM3HashWithJsInterop(): void
+    {
+        $message = 'abc';
+
+        // PHP 计算哈希
+        $digest = new SM3Digest();
+        for ($i = 0; $i < strlen($message); $i++) {
+            $digest->update(ord($message[$i]));
+        }
+        $output = str_repeat("\0", 32);
+        $digest->doFinal($output, 0);
+        $phpHash = bin2hex($output);
+
+        // JS 计算哈希
+        $nodeScript = <<<JS
+const { SM3 } = require('sm-js-bc');
+const message = '$message';
+const hash = SM3.hash(Buffer.from(message, 'utf8'));
+console.log(hash.toString('hex'));
+JS;
+
+        $jsHash = $this->executeNode($nodeScript);
+
+        $this->assertEquals($phpHash, $jsHash);
+        // SM3("abc") 的标准结果
+        $this->assertEquals('66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0', $phpHash);
+    }
+
+    /**
+     * 测试 SM2 签名/验证互操作 - PHP 签名，JS 验证
+     */
+    public function testSM2SignPhpVerifyJs(): void
+    {
+        $privateKey = '128B2FA8BD433C6C068C8D803DFF79792A519A55171B1B650C23661D15897263';
+        $publicKey = '040AE4C7798AA0F119471BEE11825BE46202BB79E2A5844495E97C04FF4DF2548A7C0240F88F1CD4E16352A73C17B7F16F07353E53A176D684A9FE0C6BB798E857';
+        $message = 'message digest';
+        $userId = '1234567812345678';
+
+        // PHP 签名
+        $signature = SM2::signWithHex($message, $privateKey, $userId);
+        $signatureHex = bin2hex($signature);
+
+        // JS 验证
+        $nodeScript = <<<JS
+const { SM2 } = require('sm-js-bc');
+const publicKey = '$publicKey';
+const message = '$message';
+const userId = '$userId';
+const signature = Buffer.from('$signatureHex', 'hex');
+
+const valid = SM2.verifyWithHex(Buffer.from(message, 'utf8'), signature, publicKey, userId);
+console.log(valid);
+JS;
+
+        $result = $this->executeNode($nodeScript);
+        $this->assertEquals('true', $result);
+    }
+
+    /**
+     * 测试 SM2 签名/验证互操作 - JS 签名，PHP 验证
+     */
+    public function testSM2SignJsVerifyPhp(): void
+    {
+        $privateKey = '128B2FA8BD433C6C068C8D803DFF79792A519A55171B1B650C23661D15897263';
+        $publicKey = '040AE4C7798AA0F119471BEE11825BE46202BB79E2A5844495E97C04FF4DF2548A7C0240F88F1CD4E16352A73C17B7F16F07353E53A176D684A9FE0C6BB798E857';
+        $message = 'JS signed message';
+        $userId = '1234567812345678';
+
+        // JS 签名
+        $nodeScript = <<<JS
+const { SM2 } = require('sm-js-bc');
+const privateKey = '$privateKey';
+const message = '$message';
+const userId = '$userId';
+
+const signature = SM2.signWithHex(Buffer.from(message, 'utf8'), privateKey, userId);
+console.log(signature.toString('hex'));
+JS;
+
+        $signatureHex = $this->executeNode($nodeScript);
+        $signature = hex2bin($signatureHex);
+
+        // PHP 验证
+        $valid = SM2::verifyWithHex($message, $signature, $publicKey, $userId);
+
+        $this->assertTrue($valid);
+    }
+
+    /**
+     * 测试 SM2 加密/解密互操作 - PHP 加密，JS 解密
+     */
+    public function testSM2EncryptPhpDecryptJs(): void
+    {
+        $privateKey = '128B2FA8BD433C6C068C8D803DFF79792A519A55171B1B650C23661D15897263';
+        $publicKey = '040AE4C7798AA0F119471BEE11825BE46202BB79E2A5844495E97C04FF4DF2548A7C0240F88F1CD4E16352A73C17B7F16F07353E53A176D684A9FE0C6BB798E857';
+        $plaintext = 'encryption test';
+
+        // PHP 加密 (C1C3C2 mode)
+        $ciphertext = SM2::encryptWithHex($plaintext, $publicKey, SM2Engine::MODE_C1C3C2);
+        $ciphertextHex = bin2hex($ciphertext);
+
+        // JS 解密
+        $nodeScript = <<<JS
+const { SM2, SM2Engine } = require('sm-js-bc');
+const privateKey = '$privateKey';
+const ciphertext = Buffer.from('$ciphertextHex', 'hex');
+
+const plaintext = SM2.decryptWithHex(ciphertext, privateKey, SM2Engine.MODE_C1C3C2);
+console.log(plaintext.toString('utf8'));
+JS;
+
+        $result = $this->executeNode($nodeScript);
+        $this->assertEquals($plaintext, $result);
+    }
+
+    /**
+     * 测试 SM2 加密/解密互操作 - JS 加密，PHP 解密
+     */
+    public function testSM2EncryptJsDecryptPhp(): void
+    {
+        $privateKey = '128B2FA8BD433C6C068C8D803DFF79792A519A55171B1B650C23661D15897263';
+        $publicKey = '040AE4C7798AA0F119471BEE11825BE46202BB79E2A5844495E97C04FF4DF2548A7C0240F88F1CD4E16352A73C17B7F16F07353E53A176D684A9FE0C6BB798E857';
+        $plaintext = 'JS encryption test';
+
+        // JS 加密
+        $nodeScript = <<<JS
+const { SM2, SM2Engine } = require('sm-js-bc');
+const publicKey = '$publicKey';
+const plaintext = '$plaintext';
+
+const ciphertext = SM2.encryptWithHex(Buffer.from(plaintext, 'utf8'), publicKey, SM2Engine.MODE_C1C3C2);
+console.log(ciphertext.toString('hex'));
+JS;
+
+        $ciphertextHex = $this->executeNode($nodeScript);
+        $ciphertext = hex2bin($ciphertextHex);
+
+        // PHP 解密
+        $decrypted = SM2::decryptWithHex($ciphertext, $privateKey, SM2Engine::MODE_C1C3C2);
+
+        $this->assertEquals($plaintext, $decrypted);
     }
 }
