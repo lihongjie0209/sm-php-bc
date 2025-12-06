@@ -1,18 +1,43 @@
 {
-    "name": "sm-bc/sm-php-bc",
-    "description": "SM2/SM3/SM4 implementation in PHP based on Bouncy Castle",
+    "name": "lihongjie0209/sm-php-bc",
+    "version": "0.1.0",
+    "description": "SM2/SM3/SM4 中国商用密码算法 PHP 实现 - 基于 Bouncy Castle 架构",
     "type": "library",
     "license": "MIT",
+    "keywords": [
+        "sm2",
+        "sm3",
+        "sm4",
+        "cryptography",
+        "chinese-cryptography",
+        "gm",
+        "elliptic-curve",
+        "block-cipher",
+        "symmetric-encryption",
+        "bouncy-castle",
+        "php",
+        "国密",
+        "商用密码"
+    ],
+    "authors": [
+        {
+            "name": "lihongjie0209",
+            "email": "your-email@example.com"
+        }
+    ],
+    "homepage": "https://github.com/lihongjie0209/sm-php-bc",
+    "support": {
+        "issues": "https://github.com/lihongjie0209/sm-php-bc/issues",
+        "source": "https://github.com/lihongjie0209/sm-php-bc"
+    },
     "autoload": {
         "psr-4": {
-            "SmBc\\": "src/",
-            "Rtgm\\SmPhpBc\\": "src/"
+            "SmBc\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "SmBc\\Tests\\": "tests/",
-            "Rtgm\\SmPhpBc\\Tests\\": "tests/"
+            "SmBc\\Tests\\": "tests/"
         }
     },
     "require": {
@@ -21,5 +46,11 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^10.0"
-    }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test-coverage": "phpunit --coverage-html coverage"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
 }
