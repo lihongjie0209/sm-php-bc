@@ -6,8 +6,8 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use SmPhpBc\SM2\SM2;
-use SmPhpBc\SM2\SM2KeyPair;
+use SmBc\Crypto\SM2;
+use SmBc\Math\EC\SM2KeyPair;
 
 echo "===== SM2 算法演示 =====\n\n";
 
