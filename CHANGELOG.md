@@ -5,6 +5,26 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.3.0] - 2025-12-08
+
+### 新增
+- 🔐 **HMAC-SM3 支持** - 完整实现 HMAC 消息认证码（RFC 2104）
+- ✅ `Mac` 接口 - 通用 MAC 算法接口
+- ✅ `HMac` 类 - 支持任意 Digest 算法的 HMAC 实现
+- 🧪 **完整测试覆盖** - 19 个测试用例，覆盖所有功能
+- 📚 **使用示例** - examples/hmac_sm3_demo.php 包含 6 个实用场景
+
+### 特性
+- ✅ 支持任意长度密钥（超长密钥自动哈希）
+- ✅ 支持增量更新（update/updateBytes）
+- ✅ 支持重置和重用
+- ✅ 完全兼容 Bouncy Castle Java 和 sm-js-bc
+- ✅ 通过标准测试向量验证
+
+### 测试
+- 🧪 所有 200 个单元测试通过（605 个断言）
+- ✅ 与 sm-js-bc 的测试向量一致
+
 ## [0.2.0] - 2025-12-08
 
 ### 新增
