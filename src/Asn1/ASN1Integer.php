@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SmBc\Asn1;
 
-use phpseclib3\Math\BigInteger;
+use SmBc\Math\BigInteger;
 
 /**
  * ASN.1 INTEGER type.
@@ -55,7 +55,7 @@ class ASN1Integer extends ASN1Primitive
      */
     public function encode(ASN1OutputStream $out): void
     {
-        $bytes = $this->value->toBytes(true); // signed big-endian
+        $bytes = $this->value->toByteArray(true); // signed big-endian
         $out->writeEncoded(ASN1Tags::INTEGER, ASN1Tags::INTEGER, $bytes);
     }
 
