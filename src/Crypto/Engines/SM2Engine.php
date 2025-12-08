@@ -38,6 +38,15 @@ class SM2Engine
 {
     public const MODE_C1C2C3 = 'C1C2C3';
     public const MODE_C1C3C2 = 'C1C3C2';
+    
+    /**
+     * Java-style static Mode access for API compatibility.
+     * Usage: SM2Engine::Mode['C1C2C3'] or SM2Engine::Mode['C1C3C2']
+     */
+    public const Mode = [
+        'C1C2C3' => self::MODE_C1C2C3,
+        'C1C3C2' => self::MODE_C1C3C2,
+    ];
 
     private SM3Digest $digest;
     private string $mode;
