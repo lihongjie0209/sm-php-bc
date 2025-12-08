@@ -53,7 +53,8 @@ class APICompatibilityTest extends TestCase
 
     private function generateKeyPair(): array
     {
-        // Use fixed private key for testing
+        // Use fixed private key for deterministic test results
+        // This ensures reproducible test outcomes across different runs
         $d = new BigInteger('0x128B2FA8BD433C6C068C8D803DFF79792A519A55171B1B650C23661D15897263');
         
         $q = $this->domainParams->getG()->multiply($d)->normalize();

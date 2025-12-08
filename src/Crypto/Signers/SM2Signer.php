@@ -382,9 +382,10 @@ class SM2Signer implements Signer
     /**
      * Convert hash bytes to integer in range [1, n-1].
      * 
-     * @deprecated Since v0.2.0. Use calculateE() instead for compatibility with Bouncy Castle Java API.
-     *             This method is kept for internal backward compatibility and will be removed in v1.0.0.
+     * @deprecated 0.2.0 Use calculateE() instead for compatibility with Bouncy Castle Java API.
+     *             This method is kept for internal backward compatibility and will be removed in 1.0.0.
      * @internal
+     * @see calculateE()
      */
     private function hashToInteger(string $hash, BigInteger $n): BigInteger
     {
