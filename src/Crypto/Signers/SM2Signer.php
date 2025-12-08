@@ -365,12 +365,47 @@ class SM2Signer implements Signer
     }
 
     /**
+     * Calculate e value from message hash.
+     * This method is protected to allow subclasses to customize the calculation.
+     * 
+     * @param BigInteger $n The order of the curve
+     * @param string $message The message hash bytes
+     * @return BigInteger The calculated e value
+     * @since 0.2.0
+     */
+    protected function calculateE(BigInteger $n, string $message): BigInteger
+    {
+        $e = BigInteger::fromByteArray($message, false);
+        return $e->mod($n);
+    }
+
+    /**
      * Convert hash bytes to integer in range [1, n-1].
+     * 
+     * @deprecated Since v0.2.0. Use calculateE() instead for compatibility with Bouncy Castle Java API.
+     *             This method is kept for internal backward compatibility and will be removed in v1.0.0.
+     * @internal
      */
     private function hashToInteger(string $hash, BigInteger $n): BigInteger
     {
-        $e = BigInteger::fromByteArray($hash, false);
-        return $e->mod($n);
+        return $this->calculateE($n, $hash);
+    }
+    
+    /**
+     * Create base point multiplier for signature generation.
+     * This method is protected to allow subclasses to customize the multiplier.
+     * 
+     * In the current implementation, we use ECPoint's built-in multiply method directly.
+     * Subclasses can override this method to provide custom multiplication strategies.
+     * 
+     * @return null This implementation doesn't use a separate multiplier object
+     * @since 0.2.0
+     */
+    protected function createBasePointMultiplier(): ?object
+    {
+        // PHP implementation uses ECPoint's built-in multiply method
+        // This method is provided for API compatibility with Bouncy Castle Java
+        return null;
     }
 
     /**
