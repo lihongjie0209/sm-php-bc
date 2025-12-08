@@ -5,6 +5,26 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.2.0] - 2025-12-08
+
+### 新增
+- 🎯 **API 一致性改进** - 与 Bouncy Castle Java 和 sm-js-bc v0.4.0 API 保持一致
+- ✅ `SM2Engine::Mode` 常量数组 - 支持 Java 风格的枚举访问 (`SM2Engine::Mode['C1C2C3']`)
+- ✅ `SM2Signer::calculateE()` 受保护方法 - 允许子类自定义 e 值计算
+- ✅ `SM2Signer::createBasePointMultiplier()` 受保护方法 - 增强可扩展性（API 兼容）
+- 🧪 **API 兼容性测试套件** - 11个新测试用例验证 API 一致性
+
+### 改进
+- 📚 完善 SM2Signer 的扩展性设计
+- 🔒 所有 API 改进保持向后兼容
+
+### 已弃用
+- ⚠️ `SM2Signer::hashToInteger()` - 请使用 `calculateE()` 替代（将在 v1.0.0 移除）
+
+### 文档
+- 📄 新增 `docs/API_IMPROVEMENTS.md` - API 改进详细说明
+- 📋 更新 `TASK_ALIGNMENT_V040.md` - 完整的功能对齐分析和规划
+
 ## [0.1.1] - 2025-12-06
 
 ### 新增
