@@ -40,4 +40,16 @@ abstract class ASN1Primitive extends ASN1Object
      * @return int The hash code
      */
     abstract public function asn1HashCode(): int;
+
+    /**
+     * Create an ASN.1 primitive from a byte array.
+     * 
+     * @param string $data The DER encoded data
+     * @return ASN1Primitive The decoded primitive
+     */
+    public static function fromByteArray(string $data): ASN1Primitive
+    {
+        $stream = new ASN1InputStream($data);
+        return $stream->readObject();
+    }
 }

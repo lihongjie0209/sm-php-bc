@@ -88,4 +88,15 @@ class ASN1Integer extends ASN1Primitive
     {
         return new self(new BigInteger($bytes, 256));
     }
+
+    /**
+     * Create an ASN1Integer from DER contents.
+     * 
+     * @param string $contents The DER-encoded contents (without tag and length)
+     * @return self The decoded integer
+     */
+    public static function fromContents(string $contents): self
+    {
+        return new self(new BigInteger($contents, 256));
+    }
 }

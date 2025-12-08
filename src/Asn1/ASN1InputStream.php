@@ -109,8 +109,94 @@ class ASN1InputStream
      */
     private function buildObject(int $tag, string $contents): ASN1Primitive
     {
-        // For now, return a generic primitive
-        // This will be expanded as we implement specific types
-        throw new \RuntimeException("ASN.1 decoding not yet fully implemented. Tag: " . $tag);
+        switch ($tag) {
+            case ASN1Tags::INTEGER:
+                return ASN1Integer::fromContents($contents);
+            
+            case ASN1Tags::OCTET_STRING:
+                return new ASN1OctetString($contents);
+            
+            case ASN1Tags::BIT_STRING:
+                if (strlen($contents) < 1) {
+                    throw new \RuntimeException("Invalid BIT STRING");
+                }
+                $padBits = ord($contents[0]);
+                $bytes = substr($contents, 1);
+                return new ASN1BitString($bytes, $padBits);
+            
+            case ASN1Tags::BOOLEAN:
+                $value = strlen($contents) > 0 && ord($contents[0]) !== 0;
+                return ASN1Boolean::getInstance($value);
+            
+            case ASN1Tags::NULL:
+                return ASN1Null::getInstance();
+            
+            case ASN1Tags::OBJECT_IDENTIFIER:
+                return ASN1ObjectIdentifier::fromContents($contents);
+            
+            case ASN1Tags::SEQUENCE:
+            case ASN1Tags::SEQUENCE | ASN1Tags::CONSTRUCTED:
+                return $this->parseSequence($contents);
+            
+            case ASN1Tags::SET:
+            case ASN1Tags::SET | ASN1Tags::CONSTRUCTED:
+                return $this->parseSet($contents);
+            
+            default:
+                // Check if it's a tagged object (context-specific)
+                if (($tag & 0xC0) == 0x80) {
+                    $tagNo = $tag & 0x1F;
+                    $explicit = ($tag & 0x20) != 0;
+                    return new ASN1TaggedObject($explicit, $tagNo, $this->parseContents($contents));
+                }
+                throw new \RuntimeException("Unsupported ASN.1 tag: 0x" . dechex($tag));
+        }
+    }
+
+    /**
+     * Parse SEQUENCE contents into elements.
+     * 
+     * @param string $contents The SEQUENCE contents
+     * @return ASN1Sequence The decoded sequence
+     */
+    private function parseSequence(string $contents): ASN1Sequence
+    {
+        $elements = $this->parseContents($contents);
+        return new DERSequence($elements);
+    }
+
+    /**
+     * Parse SET contents into elements.
+     * 
+     * @param string $contents The SET contents
+     * @return ASN1Set The decoded set
+     */
+    private function parseSet(string $contents): ASN1Set
+    {
+        $elements = $this->parseContents($contents);
+        return new ASN1Set($elements);
+    }
+
+    /**
+     * Parse constructed contents into an array of elements.
+     * 
+     * @param string $contents The contents
+     * @return array|ASN1Encodable The parsed elements or single element
+     */
+    private function parseContents(string $contents)
+    {
+        $elements = [];
+        $stream = new ASN1InputStream($contents);
+        
+        while ($stream->position < $stream->length) {
+            $elements[] = $stream->readObject();
+        }
+        
+        // If parsing for a tagged object and there's only one element, return it directly
+        if (count($elements) === 1) {
+            return $elements[0];
+        }
+        
+        return $elements;
     }
 }
