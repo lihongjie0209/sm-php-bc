@@ -5,6 +5,71 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.4.0] - 2025-12-08
+
+### 新增
+- 🔐 **PEM 格式支持** - SM2 密钥的 PEM 编码/解码
+- ✅ `PemEncoder` 类 - 通用 PEM 格式编解码器
+- ✅ `SM2KeyPemEncoder` 类 - SM2 密钥专用编码器
+- 📁 **密钥存储** - 支持将 SM2 密钥保存到文件
+- 🧪 **测试覆盖** - 15 个新测试用例
+
+### 特性
+- ✅ SM2 私钥 PEM 导出/导入
+- ✅ SM2 公钥 PEM 导出/导入
+- ✅ 标准 PEM 格式（RFC 7468）
+- ✅ 简化的 JSON 编码（易于理解）
+- ✅ 完整的往返测试
+
+### 示例
+- 🎯 **examples/sm2_pem_demo.php** - 8 个实用场景演示
+
+### 测试
+- 🧪 所有 215 个单元测试通过（642 个断言）
+
+### 说明
+本版本提供最小可用 PKI 支持，专注于密钥的 PEM 编码。使用简化的 JSON 格式而非完整的 PKCS#8，以便快速交付价值。完整的 PKCS#8/X.509 支持将在后续版本提供。
+
+## [0.3.0] - 2025-12-08
+
+### 新增
+- 🔐 **HMAC-SM3 支持** - 完整实现 HMAC 消息认证码（RFC 2104）
+- ✅ `Mac` 接口 - 通用 MAC 算法接口
+- ✅ `HMac` 类 - 支持任意 Digest 算法的 HMAC 实现
+- 🧪 **完整测试覆盖** - 19 个测试用例，覆盖所有功能
+- 📚 **使用示例** - examples/hmac_sm3_demo.php 包含 6 个实用场景
+
+### 特性
+- ✅ 支持任意长度密钥（超长密钥自动哈希）
+- ✅ 支持增量更新（update/updateBytes）
+- ✅ 支持重置和重用
+- ✅ 完全兼容 Bouncy Castle Java 和 sm-js-bc
+- ✅ 通过标准测试向量验证
+
+### 测试
+- 🧪 所有 200 个单元测试通过（605 个断言）
+- ✅ 与 sm-js-bc 的测试向量一致
+
+## [0.2.0] - 2025-12-08
+
+### 新增
+- 🎯 **API 一致性改进** - 与 Bouncy Castle Java 和 sm-js-bc v0.4.0 API 保持一致
+- ✅ `SM2Engine::Mode` 常量数组 - 支持 Java 风格的枚举访问 (`SM2Engine::Mode['C1C2C3']`)
+- ✅ `SM2Signer::calculateE()` 受保护方法 - 允许子类自定义 e 值计算
+- ✅ `SM2Signer::createBasePointMultiplier()` 受保护方法 - 增强可扩展性（API 兼容）
+- 🧪 **API 兼容性测试套件** - 11个新测试用例验证 API 一致性
+
+### 改进
+- 📚 完善 SM2Signer 的扩展性设计
+- 🔒 所有 API 改进保持向后兼容
+
+### 已弃用
+- ⚠️ `SM2Signer::hashToInteger()` - 请使用 `calculateE()` 替代（将在 v1.0.0 移除）
+
+### 文档
+- 📄 新增 `docs/API_IMPROVEMENTS.md` - API 改进详细说明
+- 📋 更新 `TASK_ALIGNMENT_V040.md` - 完整的功能对齐分析和规划
+
 ## [0.1.1] - 2025-12-06
 
 ### 新增

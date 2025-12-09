@@ -10,10 +10,17 @@
 
 ## ✨ 特性
 
+### 密码算法
 - 🔐 **SM2** - 椭圆曲线公钥密码算法（数字签名、公钥加密、密钥交换）
 - 🔒 **SM3** - 密码杂凑算法（256位消息摘要）
 - 🔑 **SM4** - 分组密码算法（128位对称加密）
+- 🔐 **HMAC-SM3** - 基于 SM3 的消息认证码 🆕
 
+### PKI 支持
+- 📄 **PEM 格式** - SM2 密钥的 PEM 编码/解码 🆕
+- 💾 **密钥存储** - 支持密钥文件导入/导出 🆕
+
+### 其他特性
 - 🎯 **零外部依赖** - 纯 PHP 实现（仅需 GMP 扩展）
 - 🔒 **完全兼容** - 与 Bouncy Castle Java 和 sm-js-bc 完全互操作
 - 📦 **PSR-4 自动加载** - 遵循 PHP 编码标准
@@ -57,6 +64,29 @@ echo 'SM3 Hash: ' . bin2hex(pack('C*', ...$hash)) . PHP_EOL;
 ```
 
 📖 **完整示例**: [examples/sm3_demo.php](./examples/sm3_demo.php)
+
+### HMAC-SM3 消息认证码 🆕
+
+```php
+<?php
+use SmBc\Crypto\Macs\HMac;
+use SmBc\Crypto\Digests\SM3Digest;
+use SmBc\Crypto\Params\KeyParameter;
+
+$key = 'my-secret-key';
+$message = 'Hello, HMAC-SM3!';
+
+$hmac = new HMac(new SM3Digest());
+$hmac->init(new KeyParameter($key));
+$hmac->updateBytes($message, 0, strlen($message));
+
+$mac = str_repeat("\x00", $hmac->getMacSize());
+$hmac->doFinal($mac, 0);
+
+echo 'HMAC: ' . bin2hex($mac) . PHP_EOL;
+```
+
+📖 **完整示例**: [examples/hmac_sm3_demo.php](./examples/hmac_sm3_demo.php)
 
 ### SM2 密钥对生成
 
@@ -243,7 +273,9 @@ echo "Keys match: " . ($keysMatch ? 'true' : 'false') . PHP_EOL;
 | 示例文件 | 说明 | 演示内容 |
 |---------|------|---------|
 | [sm3_demo.php](./examples/sm3_demo.php) | SM3 哈希计算 | 基本哈希、分段更新、不同输入处理 |
+| [hmac_sm3_demo.php](./examples/hmac_sm3_demo.php) 🆕 | HMAC-SM3 认证 | 基础 HMAC、增量更新、API 签名 |
 | [sm2_demo.php](./examples/sm2_demo.php) | SM2 完整功能 | 密钥生成、签名验证、加密解密 |
+| [sm2_pem_demo.php](./examples/sm2_pem_demo.php) 🆕 | SM2 PEM 编码 | 密钥导出/导入、文件存储 |
 | [sm4_demo.php](./examples/sm4_demo.php) | SM4 多种模式 | ECB/CBC/CTR/CFB/OFB/GCM 模式 |
 | [key_exchange_demo.php](./examples/key_exchange_demo.php) | SM2 密钥交换 | ECDH 协议、密钥协商 |
 | [advanced_demo.php](./examples/advanced_demo.php) | 高级特性 | KDF、多种填充方案、复杂场景 |
