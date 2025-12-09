@@ -86,7 +86,7 @@ class ASN1Integer extends ASN1Primitive
      */
     public static function fromBytes(string $bytes): self
     {
-        return new self(new BigInteger($bytes, 256));
+        return new self(BigInteger::fromByteArray($bytes));
     }
 
     /**
@@ -97,6 +97,6 @@ class ASN1Integer extends ASN1Primitive
      */
     public static function fromContents(string $contents): self
     {
-        return new self(new BigInteger($contents, 256));
+        return new self(BigInteger::fromByteArray($contents));
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SmBc\Pkcs;
 
 use SmBc\Asn1\ASN1BitString;
+use SmBc\Asn1\ASN1Encodable;
 use SmBc\Asn1\ASN1Object;
 use SmBc\Asn1\ASN1Primitive;
 use SmBc\Asn1\ASN1Sequence;
@@ -79,6 +80,32 @@ class SubjectPublicKeyInfo extends ASN1Object
             $this->algorithm->toASN1Primitive(),
             $this->subjectPublicKey
         ]);
+    }
+
+    /**
+     * Get an instance of SubjectPublicKeyInfo from an object.
+     * 
+     * @param mixed $obj The object (ASN1Sequence, ASN1Encodable, or SubjectPublicKeyInfo)
+     * @return self The public key info
+     */
+    public static function getInstance($obj): self
+    {
+        if ($obj instanceof self) {
+            return $obj;
+        }
+        
+        if ($obj instanceof ASN1Sequence) {
+            return self::fromSequence($obj);
+        }
+        
+        if ($obj instanceof ASN1Encodable) {
+            $primitive = $obj->toASN1Primitive();
+            if ($primitive instanceof ASN1Sequence) {
+                return self::fromSequence($primitive);
+            }
+        }
+        
+        throw new \InvalidArgumentException("Cannot create SubjectPublicKeyInfo from given object");
     }
 
     /**
