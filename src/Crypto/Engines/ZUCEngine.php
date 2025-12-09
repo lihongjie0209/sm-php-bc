@@ -201,6 +201,10 @@ class ZUCEngine implements StreamCipher
      */
     private function setKeyAndIV(string $key, string $iv): void
     {
+        // Reset R1 and R2 registers to prevent information leakage from previous states
+        $this->R1 = 0;
+        $this->R2 = 0;
+        
         // Constants for key loading
         $d = [
             0x44, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,

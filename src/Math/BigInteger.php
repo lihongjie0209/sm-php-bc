@@ -113,15 +113,56 @@ class BigInteger
     
     public function toByteArray(bool $unsigned = true): string
     {
+        // Handle negative numbers in two's complement for signed encoding
+        if (!$unsigned && gmp_cmp($this->val, 0) < 0) {
+            // For negative numbers, we need to use two's complement representation
+            // Get the absolute value and calculate required bytes
+            $positive = gmp_abs($this->val);
+            $bitLen = strlen(gmp_strval($positive, 2));
+            // Round up to next byte boundary
+            $byteLen = (int)ceil($bitLen / 8);
+            // For two's complement, add extra byte if all bits are used
+            // This ensures the high bit (sign bit) is set for negative numbers
+            if ($bitLen % 8 === 0) {
+                $byteLen++;
+            }
+            // Compute two's complement: 2^(byteLen*8) + value
+            $twosComplement = gmp_add(gmp_pow(2, $byteLen * 8), $this->val);
+            $bin = gmp_export($twosComplement, 1, GMP_MSW_FIRST | GMP_BIG_ENDIAN);
+            // Ensure we have the right number of bytes
+            if (strlen($bin) < $byteLen) {
+                $bin = str_pad($bin, $byteLen, "\x00", STR_PAD_LEFT);
+            }
+            return $bin;
+        }
+        
         $bin = gmp_export($this->val, 1, GMP_MSW_FIRST | GMP_BIG_ENDIAN);
         if ($bin === "" || $bin === false) return "\x00";
+        
+        // For signed encoding of positive numbers, ensure high bit is 0
+        if (!$unsigned && strlen($bin) > 0 && ord($bin[0]) >= 0x80) {
+            $bin = "\x00" . $bin;
+        }
+        
         return $bin;
     }
     
     public static function fromByteArray(string $bytes, bool $unsigned = true): self
     {
         if ($bytes === "") return new self(0);
-        return new self(gmp_import($bytes, 1, GMP_MSW_FIRST | GMP_BIG_ENDIAN));
+        
+        $val = gmp_import($bytes, 1, GMP_MSW_FIRST | GMP_BIG_ENDIAN);
+        
+        // Handle signed encoding (two's complement)
+        if (!$unsigned && strlen($bytes) > 0 && ord($bytes[0]) >= 0x80) {
+            // This is a negative number in two's complement
+            // Subtract 2^(byteLen*8) to get the actual negative value
+            $byteLen = strlen($bytes);
+            $modulus = gmp_pow(2, $byteLen * 8);
+            $val = gmp_sub($val, $modulus);
+        }
+        
+        return new self($val);
     }
     
     public function bitLength(): int

@@ -119,6 +119,32 @@ class PrivateKeyInfo extends ASN1Object
     }
 
     /**
+     * Get an instance of PrivateKeyInfo from an object.
+     * 
+     * @param mixed $obj The object (ASN1Sequence, ASN1Encodable, or PrivateKeyInfo)
+     * @return self The private key info
+     */
+    public static function getInstance($obj): self
+    {
+        if ($obj instanceof self) {
+            return $obj;
+        }
+        
+        if ($obj instanceof ASN1Sequence) {
+            return self::fromSequence($obj);
+        }
+        
+        if ($obj instanceof ASN1Encodable) {
+            $primitive = $obj->toASN1Primitive();
+            if ($primitive instanceof ASN1Sequence) {
+                return self::fromSequence($primitive);
+            }
+        }
+        
+        throw new \InvalidArgumentException("Cannot create PrivateKeyInfo from given object");
+    }
+
+    /**
      * Create a PrivateKeyInfo from an ASN1Sequence.
      * 
      * @param ASN1Sequence $seq The sequence
