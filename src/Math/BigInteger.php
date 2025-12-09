@@ -116,12 +116,13 @@ class BigInteger
         // Handle negative numbers in two's complement for signed encoding
         if (!$unsigned && gmp_cmp($this->val, 0) < 0) {
             // For negative numbers, we need to use two's complement representation
-            // Convert to positive, find bit length, compute two's complement
+            // Get the absolute value and calculate required bytes
             $positive = gmp_abs($this->val);
             $bitLen = strlen(gmp_strval($positive, 2));
             // Round up to next byte boundary
             $byteLen = (int)ceil($bitLen / 8);
-            // Add extra byte if high bit would be set (to preserve sign)
+            // For two's complement, add extra byte if all bits are used
+            // This ensures the high bit (sign bit) is set for negative numbers
             if ($bitLen % 8 === 0) {
                 $byteLen++;
             }

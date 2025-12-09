@@ -40,5 +40,5 @@ class ASN1Tags
     public const CONSTRUCTED = 0x20;
     public const APPLICATION = 0x40;
     public const CONTEXT_SPECIFIC = 0x80;
-    public const TAGGED = 0x80;
+    public const TAGGED = 0x80; // Alias for CONTEXT_SPECIFIC
 }
