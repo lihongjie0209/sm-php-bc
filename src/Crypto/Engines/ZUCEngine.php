@@ -207,6 +207,10 @@ class ZUCEngine implements StreamCipher
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3f
         ];
 
+        // Reset R1 and R2 registers
+        $this->R1 = 0;
+        $this->R2 = 0;
+
         // Load key and IV into LFSR
         for ($i = 0; $i < 16; $i++) {
             $this->LFSR[$i] = $this->makeU31(
