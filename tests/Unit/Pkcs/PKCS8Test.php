@@ -105,7 +105,7 @@ class PKCS8Test extends TestCase
         // Decode
         $decoded = SubjectPublicKeyInfo::getInstance(ASN1Primitive::fromByteArray($encoded));
         $this->assertInstanceOf(SubjectPublicKeyInfo::class, $decoded);
-        $this->assertEquals($publicKeyBytes, $decoded->getPublicKey()->getBytes());
+        $this->assertEquals($publicKeyBytes, $decoded->getSubjectPublicKey()->getBytes());
     }
 
     public function testPrivateKeyInfoVersion()

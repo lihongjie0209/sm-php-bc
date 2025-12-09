@@ -55,7 +55,7 @@ class ASN1Integer extends ASN1Primitive
      */
     public function encode(ASN1OutputStream $out): void
     {
-        $bytes = $this->value->toByteArray(true); // unsigned big-endian
+        $bytes = $this->value->toByteArray(false); // signed big-endian (two's complement)
         $out->writeEncoded(ASN1Tags::INTEGER, ASN1Tags::INTEGER, $bytes);
     }
 
@@ -86,7 +86,7 @@ class ASN1Integer extends ASN1Primitive
      */
     public static function fromBytes(string $bytes): self
     {
-        return new self(BigInteger::fromByteArray($bytes));
+        return new self(BigInteger::fromByteArray($bytes, false)); // signed
     }
 
     /**
@@ -97,6 +97,6 @@ class ASN1Integer extends ASN1Primitive
      */
     public static function fromContents(string $contents): self
     {
-        return new self(BigInteger::fromByteArray($contents));
+        return new self(BigInteger::fromByteArray($contents, false)); // signed
     }
 }
