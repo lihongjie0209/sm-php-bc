@@ -174,6 +174,10 @@ class ASN1InputStream
     private function parseSet(string $contents): ASN1Set
     {
         $elements = $this->parseContents($contents);
+        // Ensure we have an array for ASN1Set constructor
+        if (!is_array($elements)) {
+            $elements = [$elements];
+        }
         return new ASN1Set($elements);
     }
 

@@ -102,7 +102,6 @@ class X509Test extends TestCase
 
     public function testTBSCertificateBasic()
     {
-        $version = new ASN1Integer(2); // v3
         $serialNumber = new ASN1Integer(12345);
         
         $signatureAlg = new AlgorithmIdentifier(
@@ -126,7 +125,6 @@ class X509Test extends TestCase
         $subjectPublicKeyInfo = new SubjectPublicKeyInfo($pubKeyAlg, $pubKey);
         
         $tbsCert = new TBSCertificate(
-            $version,
             $serialNumber,
             $signatureAlg,
             $issuer,
@@ -142,7 +140,6 @@ class X509Test extends TestCase
 
     public function testX509CertificateBasic()
     {
-        $version = new ASN1Integer(2);
         $serialNumber = new ASN1Integer(99999);
         
         $signatureAlg = new AlgorithmIdentifier(
@@ -166,7 +163,6 @@ class X509Test extends TestCase
         $subjectPublicKeyInfo = new SubjectPublicKeyInfo($pubKeyAlg, $pubKey);
         
         $tbsCert = new TBSCertificate(
-            $version,
             $serialNumber,
             $signatureAlg,
             $issuer,
@@ -187,7 +183,6 @@ class X509Test extends TestCase
 
     public function testX509CertificateRoundTrip()
     {
-        $version = new ASN1Integer(2);
         $serialNumber = new ASN1Integer(54321);
         
         $signatureAlg = new AlgorithmIdentifier(
@@ -211,7 +206,6 @@ class X509Test extends TestCase
         $subjectPublicKeyInfo = new SubjectPublicKeyInfo($pubKeyAlg, $pubKey);
         
         $tbsCert = new TBSCertificate(
-            $version,
             $serialNumber,
             $signatureAlg,
             $issuer,
