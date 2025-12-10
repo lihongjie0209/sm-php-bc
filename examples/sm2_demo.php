@@ -6,19 +6,18 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use SmBc\Crypto\SM2;
-use SmBc\Math\EC\SM2KeyPair;
+use SmBc\SM2;
 
 echo "===== SM2 算法演示 =====\n\n";
 
 // 1. 生成密钥对
 echo "1. 生成 SM2 密钥对\n";
-$keyPair = SM2KeyPair::generate();
-$privateKey = $keyPair->getPrivateKey();
-$publicKey = $keyPair->getPublicKey();
+$keyPair = SM2::generateKeyPair();
+$privateKey = $keyPair->getPrivate();
+$publicKey = $keyPair->getPublic();
 
-echo "私钥: " . substr($privateKey, 0, 32) . "...\n";
-echo "公钥: " . substr($publicKey, 0, 32) . "...\n\n";
+echo "私钥: " . substr($keyPair->getPrivateKeyHex(), 0, 32) . "...\n";
+echo "公钥: " . substr($keyPair->getPublicKeyHex(), 0, 32) . "...\n\n";
 
 // 2. 数字签名
 echo "2. SM2 数字签名\n";
@@ -55,15 +54,15 @@ echo "\n6. SM2 密钥交换\n";
 echo "模拟双方协商会话密钥...\n";
 
 // 发起方
-$initiatorKeyPair = SM2KeyPair::generate();
-$initiatorEphemeralKeyPair = SM2KeyPair::generate();
+$initiatorKeyPair = SM2::generateKeyPair();
+$initiatorEphemeralKeyPair = SM2::generateKeyPair();
 
 // 响应方
-$responderKeyPair = SM2KeyPair::generate();
-$responderEphemeralKeyPair = SM2KeyPair::generate();
+$responderKeyPair = SM2::generateKeyPair();
+$responderEphemeralKeyPair = SM2::generateKeyPair();
 
-echo "发起方私钥: " . substr($initiatorKeyPair->getPrivateKey(), 0, 16) . "...\n";
-echo "响应方私钥: " . substr($responderKeyPair->getPrivateKey(), 0, 16) . "...\n";
+echo "发起方私钥: " . substr($initiatorKeyPair->getPrivateKeyHex(), 0, 16) . "...\n";
+echo "响应方私钥: " . substr($responderKeyPair->getPrivateKeyHex(), 0, 16) . "...\n";
 echo "密钥交换协商完成 ✓\n";
 
 echo "\n===== 演示完成 =====\n";
