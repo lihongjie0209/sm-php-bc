@@ -63,6 +63,7 @@ $alicePublicParams = new SM2KeyExchangePublicParameters(
     $bobEphemeralKeyPair->getPublic()
 );
 $alicePublicParams = new ParametersWithID($alicePublicParams, $bobID);
+// 128 bits (16 bytes) for the shared key length
 $aliceSharedKey = $aliceExchange->calculateKey(128, $alicePublicParams);
 
 // Bob 计算
@@ -71,6 +72,7 @@ $bobPublicParams = new SM2KeyExchangePublicParameters(
     $aliceEphemeralKeyPair->getPublic()
 );
 $bobPublicParams = new ParametersWithID($bobPublicParams, $aliceID);
+// 128 bits (16 bytes) for the shared key length
 $bobSharedKey = $bobExchange->calculateKey(128, $bobPublicParams);
 
 // 步骤 6: 验证共享密钥
