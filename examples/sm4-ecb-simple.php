@@ -13,7 +13,7 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use SmBc\Crypto\SM4;
+use SmBc\SM4;
 
 echo "=== SM4 ECB 模式简单示例 ===\n\n";
 
@@ -66,15 +66,16 @@ foreach ($testCases as $testCase) {
 }
 echo "\n";
 
-// 4. 单块加密（无填充）
-echo "--- 4. 单块加密（16字节，无填充）---\n";
+// 4. 单块加密（16字节，ECB模式）
+echo "--- 4. 单块加密（16字节，ECB模式）---\n";
 $block = str_repeat('B', 16); // 16 字节的 'B'
 echo "块数据 (hex): " . bin2hex($block) . "\n";
 
-$encryptedBlock = SM4::encryptBlock($block, $key);
+// 使用ECB加密单个块
+$encryptedBlock = SM4::encryptECB($block, $key);
 echo "加密后 (hex): " . bin2hex($encryptedBlock) . "\n";
 
-$decryptedBlock = SM4::decryptBlock($encryptedBlock, $key);
+$decryptedBlock = SM4::decryptECB($encryptedBlock, $key);
 echo "解密后 (hex): " . bin2hex($decryptedBlock) . "\n";
 echo "块加密成功: " . ($block === $decryptedBlock ? '✅' : '❌') . "\n";
 echo "\n";

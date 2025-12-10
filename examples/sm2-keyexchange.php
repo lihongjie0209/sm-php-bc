@@ -7,7 +7,7 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use SmBc\Crypto\SM2;
+use SmBc\SM2;
 use SmBc\Crypto\Agreement\SM2KeyExchange;
 use SmBc\Crypto\Params\SM2KeyExchangePrivateParameters;
 use SmBc\Crypto\Params\SM2KeyExchangePublicParameters;
